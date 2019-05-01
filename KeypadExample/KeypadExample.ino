@@ -1,4 +1,4 @@
-//#include <Key.h>
+#include <Key.h>
 #include <Keypad.h>
 
 const byte rowsCount = 3;
