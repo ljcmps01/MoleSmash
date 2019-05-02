@@ -1,3 +1,9 @@
+/*ESTADO ACTUAL
+ * Cada aproximadamente 1 segundo se obtendran dos valores random, los cuales diran que led se prenden
+ * 
+ * Idea botonera con keypad, usar un bloque switch para determinar los valores x;y presionados de acuerdo con la tecla presionada
+ */
+
 #define COL PORTK
 #define FILA PORTF
 
