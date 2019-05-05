@@ -1,7 +1,5 @@
 /*ESTADO ACTUAL
- * Cada aproximadamente 1 segundo o si se toca un boton se obtendran dos valores random, los cuales diran que led se prenden
- * HACER:variable de puntaje base, si era el correcto subir un punto, si no lo era, restarlo
- * Idea botonera con keypad, usar un bloque switch para determinar los valores x;y presionados de acuerdo con la tecla presionada
+ * Displays de puntaje y true randomness agregada
  */
 #include <Key.h>
 #include <Keypad.h>
@@ -46,8 +44,12 @@ volatile int numeros=0;
 volatile int nivel[10]={1750,1500,1250,1000,900,800,750,600,500,400};
 volatile int vel;
 volatile int seed;
+
+int Display(int puntos,bool digito);
+volatile bool m_Display=0;
+
 void setup() {
- 
+  DDRA=255;
   DDRF=255;
   FILA=0;  
   DDRK=255;
@@ -73,7 +75,7 @@ void loop() {
   char key = keypad.getKey();
   
   if (key) {
-    seed=c_Seg;
+    randomSeed(c_Seg);
     if(!start){
       Begin();
     }
@@ -111,11 +113,23 @@ ISR(TIMER1_COMPA_vect){                 //ISR es la rutina de interrupcion
       if(fila<2)fila++;
       else fila=0;
     }
+
+    //Multiplexado de displays
+    m_Display=!m_Display;
+    if(m_Display){
+      PORTA=Display(score,m_Display);        
+      PORTA&=~(1<<7);
+      PORTA|=(1<<6);
+    }
+    else{
+      PORTA=Display(score,m_Display);        
+      PORTA&=~(1<<6);
+      PORTA|=(1<<7);
+    }
   }
 }
 
 void getRand(){
-  randomSeed(seed);
   hab[r1][r2]=0;
   r1=random(3);
   r2=random(3);
@@ -203,4 +217,14 @@ void Begin(){
   start=1;
   vidas=MaxVidas;
   numeros=0;
+  score=0;
+}
+
+int Display(int puntos,bool digito){
+  if(digito){
+    return puntos/10;
+  }
+  else{
+    return puntos%10;
+  }
 }
