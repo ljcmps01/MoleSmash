@@ -8,7 +8,7 @@
 
 #define COL PORTK
 #define FILA PORTF
-
+#define MaxVidas 3
 const byte rowsCount = 3;
 const byte columsCount = 3;
  
@@ -40,6 +40,8 @@ void edit(char tecla);
 
 bool wait=0;
 volatile int score=0;
+volatile int vidas=MaxVidas;
+
 void setup() {
  
   DDRF=255;
@@ -112,66 +114,68 @@ void edit(char tecla){
       hab[0][0]=0;
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 50:
       if(hab[0][1]){
       hab[0][1]=!hab[0][1];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 51:
       if(hab[0][2]){
       hab[0][2]=!hab[0][2];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 52:
       if(hab[1][0]){
       hab[1][0]=!hab[1][0];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 53:
       if(hab[1][1]){
       hab[1][1]=!hab[1][1];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 54:
       if(hab[1][2]){
       hab[1][2]=!hab[1][2];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 55:
       if(hab[2][0]){
       hab[2][0]=!hab[2][0];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 56:
       if(hab[2][1]){
       hab[2][1]=!hab[2][1];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     case 57:
       if(hab[2][2]){
       hab[2][2]=!hab[2][2];
       score++;
       }
-      else score--;
+      else vidas--;
       break;
     default:break;
   }
   Serial.print("Score: ");
   Serial.println(score);
+  Serial.print("Vidas: ");
+  Serial.println(vidas);
 }
