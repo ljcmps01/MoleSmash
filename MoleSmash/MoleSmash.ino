@@ -41,11 +41,15 @@ void edit(char tecla);
 bool wait=0;
 volatile int score=0;
 volatile int vidas=MaxVidas;
-
+volatile bool start=0;
+volatile int numeros=0;
+volatile int nivel[10]={1750,1500,1250,1000,900,800,750,600,500,400};
+volatile int vel;
+volatile int seed;
 void setup() {
  
   DDRF=255;
-  FILA=1;  
+  FILA=0;  
   DDRK=255;
   COL=254;
   Serial.begin(9600);
@@ -69,35 +73,49 @@ void loop() {
   char key = keypad.getKey();
   
   if (key) {
-    edit(key);
+    seed=c_Seg;
+    if(!start){
+      Begin();
+    }
+    else edit(key);
   }  
 }
 
 ISR(TIMER1_COMPA_vect){                 //ISR es la rutina de interrupcion
-  if(c_Seg==0||wait){
-    getRand();
-    c_Seg=1953;
-    wait=0;
-  }
-  else{
-    c_Seg--;
-  }
-
-  
-  //Multiplexado de la matriz
-  if(hab[fila][col])
-  COL=~(1<<col);
-  else COL=~(0<<col);
-  FILA=(1<<fila);
-  if(col<2)col++;
-  else{
-    col=0;
-    if(fila<2)fila++;
-    else fila=0;
+  if(start){
+    if(c_Seg==0){
+      getRand();
+      if(numeros<=100)vel=numeros/10;
+      else vel=9;
+      c_Seg=nivel[vel];
+      numeros++;
+      
+      Serial.print("Numeros: ");
+      Serial.println(numeros);      
+      Serial.print("Velocidad: ");
+      Serial.println(vel);
+      wait=0;
+    }
+    else{
+      c_Seg--;
+    }
+    
+    //Multiplexado de la matriz
+    if(hab[fila][col])
+    COL=~(1<<col);
+    else COL=~(0<<col);
+    FILA=(1<<fila);
+    if(col<2)col++;
+    else{
+      col=0;
+      if(fila<2)fila++;
+      else fila=0;
+    }
   }
 }
 
 void getRand(){
+  randomSeed(seed);
   hab[r1][r2]=0;
   r1=random(3);
   r2=random(3);
@@ -178,4 +196,11 @@ void edit(char tecla){
   Serial.println(score);
   Serial.print("Vidas: ");
   Serial.println(vidas);
+  if(vidas==0)start=0;
+}
+
+void Begin(){
+  start=1;
+  vidas=MaxVidas;
+  numeros=0;
 }
