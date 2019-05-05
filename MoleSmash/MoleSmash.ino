@@ -1,13 +1,28 @@
 /*ESTADO ACTUAL
- * Cada aproximadamente 1 segundo se obtendran dos valores random, los cuales diran que led se prenden
- * 
+ * Cada aproximadamente 1 segundo o si se toca un boton se obtendran dos valores random, los cuales diran que led se prenden
+ * HACER:variable de puntaje base, si era el correcto subir un punto, si no lo era, restarlo
  * Idea botonera con keypad, usar un bloque switch para determinar los valores x;y presionados de acuerdo con la tecla presionada
  */
+#include <Key.h>
+#include <Keypad.h>
 
 #define COL PORTK
 #define FILA PORTF
 
-volatile int c_Seg=0;   //Cuando llegue a 1953 habrá llegado al segundo
+const byte rowsCount = 3;
+const byte columsCount = 3;
+ 
+char keys[rowsCount][columsCount] = {
+   { '1','2','3' },
+   { '4','5','6' },
+   { '7','8','9' },
+
+};
+
+const byte rowPins[rowsCount] = { 11, 10, 9 };
+const byte columnPins[columsCount] = { 7, 6, 5 };
+
+volatile int c_Seg=1953;   //Cuando llegue a 1953 habrá llegado al segundo
 volatile int r1,r2;     //variables random
 const int out[7]={1,2,4,8,16,32,64};
 bool hab[3][3]={
@@ -19,6 +34,12 @@ volatile int fila=0,col=0;
 
 void getRand();
 
+Keypad keypad = Keypad(makeKeymap(keys), rowPins, columnPins, rowsCount, columsCount);
+
+void edit(char tecla);
+
+bool wait=0;
+volatile int score=0;
 void setup() {
  
   DDRF=255;
@@ -43,16 +64,21 @@ void setup() {
 }
 
 void loop() {
-
+  char key = keypad.getKey();
+  
+  if (key) {
+    edit(key);
+  }  
 }
 
 ISR(TIMER1_COMPA_vect){                 //ISR es la rutina de interrupcion
-  if(c_Seg<=1953){
-    c_Seg++;
+  if(c_Seg==0||wait){
+    getRand();
+    c_Seg=1953;
+    wait=0;
   }
   else{
-    getRand();
-    c_Seg=0;
+    c_Seg--;
   }
 
   
@@ -74,4 +100,78 @@ void getRand(){
   r1=random(3);
   r2=random(3);
   hab[r1][r2]=1;
+}
+
+void edit(char tecla){
+  wait=1;
+  Serial.println(tecla);
+  switch(tecla){
+    
+    case 49:
+      if(hab[0][0]){
+      hab[0][0]=0;
+      score++;
+      }
+      else score--;
+      break;
+    case 50:
+      if(hab[0][1]){
+      hab[0][1]=!hab[0][1];
+      score++;
+      }
+      else score--;
+      break;
+    case 51:
+      if(hab[0][2]){
+      hab[0][2]=!hab[0][2];
+      score++;
+      }
+      else score--;
+      break;
+    case 52:
+      if(hab[1][0]){
+      hab[1][0]=!hab[1][0];
+      score++;
+      }
+      else score--;
+      break;
+    case 53:
+      if(hab[1][1]){
+      hab[1][1]=!hab[1][1];
+      score++;
+      }
+      else score--;
+      break;
+    case 54:
+      if(hab[1][2]){
+      hab[1][2]=!hab[1][2];
+      score++;
+      }
+      else score--;
+      break;
+    case 55:
+      if(hab[2][0]){
+      hab[2][0]=!hab[2][0];
+      score++;
+      }
+      else score--;
+      break;
+    case 56:
+      if(hab[2][1]){
+      hab[2][1]=!hab[2][1];
+      score++;
+      }
+      else score--;
+      break;
+    case 57:
+      if(hab[2][2]){
+      hab[2][2]=!hab[2][2];
+      score++;
+      }
+      else score--;
+      break;
+    default:break;
+  }
+  Serial.print("Score: ");
+  Serial.println(score);
 }
